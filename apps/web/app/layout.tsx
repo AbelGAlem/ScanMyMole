@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
 
 const outfit = localFont({
   src: "../public/fonts/Outfit.ttf",
@@ -20,7 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable}`}>
-        {children}
+        <Navbar />
+        <main className="flex flex-col items-center justify-center w-full">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );
