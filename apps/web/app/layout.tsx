@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${outfit.variable}`}>
+      <body className={`${outfit.variable} bg-[#f7f7f7]`}>
         <Navbar />
         <main className="flex flex-col items-center justify-center w-full">
           {children}
