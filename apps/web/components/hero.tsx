@@ -17,7 +17,6 @@ export default function HeroSection() {
       <button className="px-4 py-2 rounded-full text-white font-semibold bg-[#690500] border-2 border-[#3D0000]">
         Scan Now
       </button>
-      <div className="h-36"></div>
     </section>
   )
 }
