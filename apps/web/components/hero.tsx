@@ -1,4 +1,6 @@
 import React from 'react'
+import UploadDialog from './uploadDialog'
+import { Button } from './ui/button'
 
 export default function HeroSection() {
   return (
@@ -7,16 +9,14 @@ export default function HeroSection() {
         <h3 className="text-sm font-medium">SKIN CANCER DETECTION</h3>
       </div>
       <h1 className="text-[2.56rem] md:text-[3.125rem] lg:text-[5rem] leading-none text-center mt-6 mb-4">
-        Early Detection Saves Lives.
+        Early Detection <span className='text-blue-700 font-serif italic'>Saves Lives</span>.
         Analyze Skin With AI
       </h1>
       <p className="md:w-[32rem] leading-5 text-center mb-6">
         Upload a skin image and receive a smart, easy-to-understand medical report. 
         Powered by AI, guided by care.
       </p>
-      <button className="px-4 py-2 rounded-full text-white font-semibold bg-[#690500] border-2 border-[#3D0000]">
-        Scan Now
-      </button>
+      <UploadDialog/>
     </section>
   )
 }
