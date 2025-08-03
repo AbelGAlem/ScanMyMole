@@ -1,4 +1,4 @@
-import { faqItems } from "@/app/constants"
+import { faqItems } from "@/constants"
 import {
     Accordion,
     AccordionContent,

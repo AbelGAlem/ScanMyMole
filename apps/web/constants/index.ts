@@ -25,3 +25,12 @@ export const faqItems = [
       "If the app identifies a spot as potentially high risk, we recommend making an appointment with a dermatologist as soon as possible. The app provides guidance, but only a medical professional can make an official diagnosis and recommend treatment."
   }
 ];
+
+export const steps = [
+  "Validating image quality",
+  "Detecting skin region",
+  "Analyzing skin features",
+  "Running cancer detection AI",
+  "Classifying possible conditions",
+  "Finalizing report",
+]

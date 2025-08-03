@@ -1,10 +1,11 @@
+import Scanner from '@/components/scanner'
 import React from 'react'
 
 const ResultsPage = () => {
   return (
-    <div>
-      <h1>Results</h1>
-    </div>
+    <>
+      <Scanner />
+    </>
   )
 }
 
