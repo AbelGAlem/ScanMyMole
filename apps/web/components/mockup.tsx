@@ -3,8 +3,8 @@ import Image from "next/image"
 
 export default function MokcupSection() {
     return(
-        <section className="bg-[url(/mockupBG.png)] bg-contain flex justify-center items-center mt-12 md:16 lg:mt-24">
-            <div className="relative w-1/2 translate-x-12 md:translate-x-20 lg:translate-x-28">
+        <section className="bg-[url(/mockupBG.png)] bg-cover flex justify-center items-center mt-16 lg:mt-24">
+            <div className="relative w-[55%] md:w-1/2 translate-x-12 md:translate-x-20 lg:translate-x-28">
                 <Image
                     src="/mockup.png"
                     alt="Mockup"
