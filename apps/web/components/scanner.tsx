@@ -28,6 +28,9 @@ export default function Scanner() {
             setStep(s => s + 1)
           } else {
             setFinished(true)
+            setTimeout(() => {
+              router.push("/results/someuid")
+            }, 1000)
           }
         }, 350)
       }, 1200) 

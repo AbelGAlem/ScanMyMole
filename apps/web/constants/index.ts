@@ -34,3 +34,15 @@ export const steps = [
   "Classifying possible conditions",
   "Finalizing report",
 ]
+
+
+export const mockReport = {
+  riskLevel: "Low",
+  riskDescription: "The analysis detected features that may be associated with a higher risk skin lesion.",
+  confidence: 92,
+  diagnosis: "Melanoma",
+  diagnosisDescription: "Melanoma is a serious form of skin cancer that requires prompt medical attention.",
+  advice: "Please consult a certified dermatologist as soon as possible. Early detection and treatment are crucial.",
+  timestamp: "2025-08-03 12:34",
+}
+
