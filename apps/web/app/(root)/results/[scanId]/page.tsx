@@ -7,28 +7,10 @@ import { mockReport } from "@/constants"
 import InfoTooltip from "@/components/infoTooltip"
 import DiagnosisBadges from "@/components/diagnosisBadges"
 import { Button } from "@/components/ui/button"
-import dynamic from "next/dynamic";
-
-const GaugeComponent = dynamic(() => import('react-gauge-component'), { 
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center w-64 h-32">
-      <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent" />
-    </div>
-  ),
-});
-
-//fall back component if there a problem with gauge component
-const GaugeFallback = ({ value }: { value: number }) => (
-  <div className="flex flex-col items-center justify-center w-64 h-32 bg-gray-50 rounded-lg border-2 border-gray-200">
-    <div className="text-3xl font-bold text-gray-700">{value}%</div>
-    <div className="text-sm text-gray-500 mt-1">Confidence Score</div>
-  </div>
-);
+import GaugeComponent from "@/components/gauge"
 
 export default function ReportDetailPage() {
   const [imgURL, setImgURL] = useState<string | null>(null)
-  const [gaugeError, setGaugeError] = useState(false)
   
   const file = useImageStore((s) => s.file)
   const router = useRouter()
@@ -65,20 +47,6 @@ export default function ReportDetailPage() {
       URL.revokeObjectURL(url)
     }
   }, [file, router])
-
-  //set fallback state if import fails, to render the fallback component
-  useEffect(() => {
-    const loadGauge = async () => {
-      try {
-        await import('react-gauge-component');
-      } catch (error) {
-        console.error('Failed to load gauge component:', error);
-        setGaugeError(true);
-      }
-    };
-    
-    loadGauge();
-  }, []);
 
   //TODO: change to a better loading ui
   if (!file || !imgURL) return <div className="mt-20">Loading...</div>
@@ -123,37 +91,7 @@ export default function ReportDetailPage() {
       {/* Confidence Score */}
       <div className="flex flex-col items-center ">
         <span className="font-semibold self-start ">AI Confidence Score:</span>
-        {gaugeError ? (
-          <GaugeFallback value={60} />
-        ) : (
-          <GaugeComponent
-            value={80}
-            type="semicircle"
-            arc={{
-              width: 0.2,
-              padding: 0.01,
-              colorArray: ['#EF4444', '#FACC15', '#22C55E'],
-              //gradient: true,
-              subArcs: [
-                { limit: 40, color: '#EF4444', }, 
-                { limit: 70, color: '#FACC15', },   
-                { limit: 100, color: '#22C55E',}, 
-              ],
-            }}
-            pointer={{type: "arrow"}}
-            labels={{
-              valueLabel: {
-                formatTextValue: val => `${val}%`,
-                style: {
-                  fontSize: 36,
-                  fontWeight: 700,
-                  fill: "#111827", 
-                  textShadow: "0 1px 6px #e5e7eb"
-                },
-              }
-            }}
-          />
-        )}
+        <GaugeComponent percent={81} />
       </div>
       <span className="font-bold">Treatment: <span className="font-normal text-sm text-gray-600" >{mockReport.advice}</span></span>
       {/* Tip */}
