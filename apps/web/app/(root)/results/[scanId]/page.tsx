@@ -1,40 +1,39 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
 import { useImageStore } from "@/store/imageStore"
-import { AlertTriangle, Info, Download } from "lucide-react"
+import { AlertTriangle, Info, Download, CheckCircle, ShieldAlert } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { mockReport } from "@/constants"
 import InfoTooltip from "@/components/infoTooltip"
 import DiagnosisBadges from "@/components/diagnosisBadges"
 import { Button } from "@/components/ui/button"
 import GaugeComponent from "@/components/gauge"
+import { diagnosisInfo } from "@/constants"
 
 export default function ReportDetailPage() {
   const [imgURL, setImgURL] = useState<string | null>(null)
-  
   const file = useImageStore((s) => s.file)
   const router = useRouter()
-
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
 
-  //scroll down to report
+  //mock AI respose
+  const serverResponse = {
+    diagnosis: "Squamous cell carcinoma",
+    confidence: 91, 
+  }
+  const dInfo = diagnosisInfo[serverResponse.diagnosis] || null
+
+  //scroll a litte down
   useEffect(() => {
     const timer = setTimeout(() => {
       if (scrollTargetRef.current) {
         const offset = 30;
         const y = scrollTargetRef.current.getBoundingClientRect().top + window.scrollY - offset;
-  
-        window.scrollTo({
-          top: y,
-          behavior: 'smooth',
-        });
+        window.scrollTo({top: y,behavior: 'smooth',});
       }
     }, 100);
-
     return () => clearTimeout(timer);
   }, [imgURL]);
 
-  
   //load selected image or redirect
   useEffect(() => {
     if (!file) {
@@ -49,24 +48,22 @@ export default function ReportDetailPage() {
   }, [file, router])
 
   //TODO: change to a better loading ui
-  if (!file || !imgURL) return <div className="mt-20">Loading...</div>
+  if (!file || !imgURL || !dInfo) return <div className="mt-20">Loading...</div>
+
+  const Icon = dInfo.color === "red" ? AlertTriangle : dInfo.color === "green" ? CheckCircle : ShieldAlert
 
   return (
     <div className="md:max-w-lg md:mx-auto mx-6 p-4 md:p-6 bg-white shadow-2xl rounded-2xl mt-8 space-y-2" ref={scrollTargetRef}>
       {/* Header/Diagnosis */}
-      <div className="flex items-start gap-3 mb-4" >
-        <AlertTriangle className="text-red-500 mt-1" size={32} />
+      <div className="flex items-start gap-3 mb-4">
+        <Icon className={`text-${dInfo.color}-700  mt-1`} size={32} />
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
-            <div className="text-3xl font-bold mr-2">{mockReport.diagnosis}</div> 
-            <InfoTooltip info={mockReport.diagnosisDescription} />
+            <div className="text-3xl font-bold mr-2">{serverResponse.diagnosis}</div>
+            <InfoTooltip info={dInfo.details} />
           </div>
-          <DiagnosisBadges
-            badges={[
-              { label: "Cancerous", variant: "destructive" },
-              { label: "Requires Biopsy", variant: "default" },
-            ]}
-          />
+          <span className="text-sm text-gray-600 mb-2">{dInfo.info}</span>
+          <DiagnosisBadges badges={dInfo.badges} />
         </div>
       </div>
       {/* Image Preview */}
@@ -74,34 +71,37 @@ export default function ReportDetailPage() {
         <img
           src={imgURL}
           alt="Scanned area"
-          className="w-42 h-42 my-2 object-cover rounded-lg shadow border-6 border-red-500"
+          className={`w-42 h-42 my-2 object-cover rounded-lg shadow border-6 border-${dInfo.color}-500`}
         />
       </div>
       {/* Risk Level */}
-      <span className="font-semibold">Risk Assesment:</span>
-      <div className="flex items-center gap-3 shadow mt-1 p-4">
-        <div className={`px-3 py-1 rounded-full text-sm font-semibold 
-          ${mockReport.riskLevel === "High" ? "bg-red-100 text-red-700" :
-            mockReport.riskLevel === "Medium" ? "bg-yellow-100 text-yellow-700" :
-              "bg-green-100 text-green-700"}`}>
-          {mockReport.riskLevel}
+      <span className="font-semibold">Risk Assessment:</span>
+      <div className={`flex items-center gap-3 shadow mt-1 p-4 bg-${dInfo.color}-50`}>
+        <div className={`px-3 py-1 rounded-full text-sm font-semibold bg-${dInfo.color}-100 text-${dInfo.color}-700`}>
+          {dInfo.riskLevel}
         </div>
-        <span className="text-sm text-gray-600">{mockReport.riskDescription}</span>
+        <span className="text-sm text-gray-600">{dInfo.riskDescription}</span>
       </div>
       {/* Confidence Score */}
       <div className="flex flex-col items-center ">
-        <span className="font-semibold self-start ">AI Confidence Score:</span>
-        <GaugeComponent percent={81} />
+        <span className="font-semibold self-start">AI Confidence Score:</span>
+        <GaugeComponent percent={serverResponse.confidence} />
+        <span className="text-xs text-gray-600 mt-1">
+          The AI is {serverResponse.confidence}% confident in this diagnosis.
+        </span>
       </div>
-      <span className="font-bold">Treatment: <span className="font-normal text-sm text-gray-600" >{mockReport.advice}</span></span>
-      {/* Tip */}
-      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 my-6 rounded shadow max-w-xl mx-auto">
+      {/* Next Steps */}
+      <span className="font-bold">Next Steps:</span>
+      <ul className="list-disc ml-6 text-sm mb-2">
+        {dInfo.nextSteps.map((step, i) => <li key={i}>{step}</li>)}
+      </ul>
+      {/* Helpful Fact */}
+      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 my-4 rounded shadow max-w-xl mx-auto">
         <div className="flex items-center">
-            <Info className="text-cyan-500 mt-0.5 mr-4" size={20} />
-            <title>Tip</title>
-          <span className="text-blue-900 font-medium">Tip:</span>
+          <Info className="text-cyan-500 mt-0.5 mr-2" size={20} />
+          <span className="text-blue-900 font-medium">Did you know?</span>
         </div>
-        <p className="ml-9 text-sm text-blue-800">Don't check your skin lesion obsessively. Changes happen slowly track once a month instead.</p>
+        <p className="ml-7 text-sm text-blue-800">{dInfo.fact}</p>
       </div>
       {/* Download Button */}
       <div className="flex justify-center">
