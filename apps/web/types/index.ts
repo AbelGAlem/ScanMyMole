@@ -14,3 +14,11 @@ export interface DiagnosisInfo {
   fact: string;
   badges: Badge[];
 }
+
+export type PredictTopItem = {
+  label: string;
+  probability: number;
+};
+export type PredictResponse = {
+  top: PredictTopItem[];
+};

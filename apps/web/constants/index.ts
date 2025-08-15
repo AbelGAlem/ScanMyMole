@@ -48,6 +48,19 @@ export const mockReport = {
   timestamp: "2025-08-03 12:34",
 }
 
+// Map shorthand labels to full diagnosis names
+ export const diagnosisMapping: Record<string, string> = {
+    "bcc": "Basal cell carcinoma",
+    "mel": "Melanoma", 
+    "scc": "Squamous cell carcinoma",
+    "akiec": "Actinic keratosis",
+    "bkl": "Benign keratosis",
+    "df": "Dermatofibroma",
+    "vasc": "Vascular lesion",
+    "nv": "Melanocytic nevus"
+  }
+
+// TODO: Consider mapping on server side
 export const diagnosisInfo: Record<string, DiagnosisInfo> = {
   "Basal cell carcinoma": {
     cancerous: true,

@@ -1,26 +1,34 @@
 "use client"
-import { useEffect, useRef, useState } from "react"
+import { Key, useEffect, useRef, useState } from "react"
 import { useImageStore } from "@/store/imageStore"
-import { AlertTriangle, Info, Download, CheckCircle, ShieldAlert } from "lucide-react"
+import { AlertTriangle, Info, Download, CheckCircle, ShieldAlert, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 import InfoTooltip from "@/components/infoTooltip"
 import DiagnosisBadges from "@/components/diagnosisBadges"
 import { Button } from "@/components/ui/button"
 import GaugeComponent from "@/components/gauge"
-import { diagnosisInfo } from "@/constants"
+import { diagnosisInfo, diagnosisMapping } from "@/constants"
 
 export default function ReportDetailPage() {
   const [imgURL, setImgURL] = useState<string | null>(null)
-  const file = useImageStore((s) => s.file)
   const router = useRouter()
   const scrollTargetRef = useRef<HTMLDivElement | null>(null);
 
-  //mock AI respose
-  const serverResponse = {
-    diagnosis: "Squamous cell carcinoma",
-    confidence: 91, 
-  }
-  const dInfo = diagnosisInfo[serverResponse.diagnosis] || null
+  const file = useImageStore((s) => s.file)
+  const predictionData = useImageStore((s) => s.predictionData)
+  
+  // Extract prediction information
+  // TODO: probably better to get final result from server, change server response
+  const prediction = predictionData?.top?.[0] 
+  const diagnosis = prediction?.label || "Unknown"
+  const confidence = prediction?.probability || 0
+  const confidencePercentage = Math.round(confidence * 100)
+
+  const fullDiagnosis = diagnosisMapping[diagnosis.toLowerCase()] || diagnosis
+  const allPredictions = predictionData?.top || []
+
+  // Get diagnosis detail information from constants
+  const dInfo = diagnosisInfo[fullDiagnosis]
 
   //scroll a litte down
   useEffect(() => {
@@ -36,7 +44,7 @@ export default function ReportDetailPage() {
 
   //load selected image or redirect
   useEffect(() => {
-    if (!file) {
+    if (!file || !predictionData?.top?.[0]) {
       router.push("/")
       return
     }
@@ -47,7 +55,7 @@ export default function ReportDetailPage() {
     }
   }, [file, router])
 
-  //TODO: change to a better loading ui
+  //TODO: change to a better loading ui and error falback state for dinfo
   if (!file || !imgURL || !dInfo) return <div className="mt-20">Loading...</div>
 
   const Icon = dInfo.color === "red" ? AlertTriangle : dInfo.color === "green" ? CheckCircle : ShieldAlert
@@ -59,7 +67,7 @@ export default function ReportDetailPage() {
         <Icon className={`text-${dInfo.color}-700  mt-1`} size={32} />
         <div className="flex flex-col">
           <div className="flex flex-row items-center">
-            <div className="text-3xl font-bold mr-2">{serverResponse.diagnosis}</div>
+            <div className="text-3xl font-bold mr-2">{fullDiagnosis}</div>
             <InfoTooltip info={dInfo.details} />
           </div>
           <span className="text-sm text-gray-600 mb-2">{dInfo.info}</span>
@@ -85,11 +93,37 @@ export default function ReportDetailPage() {
       {/* Confidence Score */}
       <div className="flex flex-col items-center ">
         <span className="font-semibold self-start">AI Confidence Score:</span>
-        <GaugeComponent percent={serverResponse.confidence} />
+        <GaugeComponent percent={confidencePercentage} />
         <span className="text-xs text-gray-600 mt-1">
-          The AI is {serverResponse.confidence}% confident in this diagnosis.
+          The AI is {confidencePercentage}% confident in this diagnosis.
         </span>
       </div>
+       {/* Optional All Predictions */}
+       {/* {allPredictions.length > 1 && (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-medium mb-4">All Possible Diagnoses</h3>
+            <div className="space-y-3">
+              {allPredictions.slice(0, 5).map((pred: { label: string; probability: any }, index: Key | null | undefined) => {
+                const predDiagnosis = diagnosisMapping[pred.label.toLowerCase()] || pred.label
+                const predConfidence = Math.round((pred.probability || 0) * 100)
+                return (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                    <div>
+                      <p className="font-medium text-gray-900">{predDiagnosis}</p>
+                      <p className="text-sm text-gray-600">Confidence: {predConfidence}%</p>
+                    </div>
+                    <div className="w-20 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${predConfidence}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )} */}
       {/* Next Steps */}
       <span className="font-bold">Next Steps:</span>
       <ul className="list-disc ml-6 text-sm mb-2">

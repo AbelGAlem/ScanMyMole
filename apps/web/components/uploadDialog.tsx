@@ -3,33 +3,26 @@ import React, { useCallback, useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { Dialog,DialogClose,DialogContent,DialogDescription,DialogFooter,DialogHeader,DialogTitle,DialogTrigger} from "@/components/ui/dialog"
 import { Button } from "./ui/button"
-import { UploadCloud, X } from "lucide-react"
+import { UploadCloud, X, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useImageStore } from "@/store/imageStore"
+import { PredictResponse } from "@/types"
 
 export default function UploadDialog() {
   const [file, setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [isOpen, setIsOpen] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   const setImage = useImageStore((s) => s.setImage)
-  const router = useRouter()
+  const setPredictionData = useImageStore((s) => s.setPredictionData)
+  const setError = useImageStore((s) => s.setError)
 
-  //clean ip preview
-  useEffect(() => {
-    return () => {
-      if (preview) {
-        URL.revokeObjectURL(preview)
-      }
-    }
-  }, [preview])
+  const router = useRouter()
 
   //handle dropping of images in area, with 5MB max size
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const img = acceptedFiles[0]
     if (img && img.size <= 5 * 1024 * 1024) {
       setFile(img)
-      setPreview(URL.createObjectURL(img))
     } else if (img) {
       alert("Max file size is 5 MB")
     }
@@ -45,19 +38,36 @@ export default function UploadDialog() {
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation()
     setFile(null)
-    setPreview(null)
   }
 
-  //set image state, close dialog, go to results page
-  function handleUpload() {
-    //TODO: upload to server
+  //upload image to prediction API and navigate to results
+  async function handleUpload() {
+    if (!file) return
+    setIsUploading(true)
+
+    // Store the image and navigate to loading/scanner page
     setImage(file)
-    setIsOpen(false)
     router.push("/results")
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch("/api/predict", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Request failed");
+
+      setPredictionData(data as PredictResponse)
+    } catch (err) {
+      console.error('Upload error:', err)
+      setError(err instanceof Error ? err.message : 'Failed to upload image. Please try again.')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog >
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -70,7 +80,7 @@ export default function UploadDialog() {
         <DialogHeader className="items-start">
           <DialogTitle>Upload Image Here.</DialogTitle>
           <DialogDescription>
-            Add your image here, up to 10 MB max.
+            Add your image here, up to 5 MB max.
           </DialogDescription>
         </DialogHeader>
 
@@ -85,7 +95,7 @@ export default function UploadDialog() {
           <input {...getInputProps()} />
 
           <div className="grid place-items-center gap-y-1">
-            {!preview && (
+            {!file && (
               <>
                 <UploadCloud size={36} color="blue" />
                 <p className="mt-2">
@@ -95,13 +105,13 @@ export default function UploadDialog() {
                     <>Drag your file or <span className="text-blue-700 underline cursor-pointer">browse</span></>
                   )}
                 </p>
-                <p className="text-xs text-gray-700">Max 10 MB files are allowed</p>
+                <p className="text-xs text-gray-700">Max 5 MB files are allowed</p>
               </>
             )}
-            {preview && (
+            {file && (
               <div className="relative group">
                 <img
-                  src={preview}
+                  src={URL.createObjectURL(file)}
                   alt="Preview"
                   className="max-h-40 rounded-md"
                 />
@@ -113,7 +123,7 @@ export default function UploadDialog() {
                 >
                   <X size={16} />
                 </button>
-                <div className="text-xs text-gray-600 mt-2 text-center">{file?.name}</div>
+                <div className="text-xs text-gray-600 mt-2 text-center">{file.name}</div>
               </div>
             )}
           </div>
@@ -121,11 +131,22 @@ export default function UploadDialog() {
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" disabled={isUploading}>Cancel</Button>
           </DialogClose>
 
-          <Button onClick={handleUpload} className="bg-blue-800" disabled={!file}>
-            Upload
+          <Button 
+            onClick={handleUpload} 
+            className="bg-blue-800" 
+            disabled={!file || isUploading}
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              'Upload'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

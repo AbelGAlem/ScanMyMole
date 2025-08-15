@@ -6,6 +6,7 @@ import Lottie from "lottie-react"
 import scanAnimation from "@/public/lottie/scanAnimation.json"
 import { Loader2, CheckCircle2 } from "lucide-react"
 import { steps } from "@/constants"
+import ErrorComponent from "./simpleError"
 
 export default function Scanner() {
   const [imgURL, setImgURL] = useState<string | null>(null)
@@ -14,12 +15,20 @@ export default function Scanner() {
   const [finished, setFinished] = useState(false)
 
   const file = useImageStore((s) => s.file)
+  const predictionData = useImageStore((s) => s.predictionData)
+  const error = useImageStore((s) => s.error)
   const router = useRouter()
 
-  //simulate step progress
-  //TODO: integrate with backend
+  // Check if we have prediction data and show results
   useEffect(() => {
-    if (step < steps.length && !finished) {
+    if (predictionData && finished) {
+      router.push("/results/report")
+    }
+  }, [predictionData, finished, router])
+
+  //simulate step progress only if no prediction data and no error
+  useEffect(() => {
+    if (!error && step < steps.length && !finished) {
       const timer = setTimeout(() => {
         setShowCheck(true)
         setTimeout(() => {
@@ -28,15 +37,12 @@ export default function Scanner() {
             setStep(s => s + 1)
           } else {
             setFinished(true)
-            setTimeout(() => {
-              router.push("/results/someuid")
-            }, 1000)
           }
         }, 350)
       }, 1200) 
       return () => clearTimeout(timer)
     }
-  }, [step, finished])
+  }, [step, finished, error])
 
   //load selected image or redirect
   useEffect(() => {
@@ -51,7 +57,16 @@ export default function Scanner() {
     }
   }, [file, router])
 
+  //TODO: better loading state
   if (!file || !imgURL) return <div className="mt-20">Loading...</div>
+
+  // Show error state
+  if (error) {
+    return <ErrorComponent
+      title="Something went wrong."
+      message={error}
+    />
+  }
 
   return (
     <div className="flex flex-col items-center space-y-8 mt-6">
@@ -90,9 +105,11 @@ export default function Scanner() {
           ></div>
         </div>
         {/* Message */}
-        <div className="mt-4 text-xs text-gray-500 text-center">
+        <div className="mx-12 mt-4 text-xs text-gray-500 text-center">
           {finished
-            ? "Your skin analysis is ready."
+            ? predictionData 
+              ? "Your skin analysis is ready. Redirecting to results..."
+              : "Analysis complete but no data received."
             : "Please hold on while we analyze your scan. This usually takes less than a minute."}
         </div>
       </div>
