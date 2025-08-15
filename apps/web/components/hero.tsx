@@ -1,6 +1,6 @@
 import React from 'react'
 import UploadDialog from './uploadDialog'
-import { Button } from './ui/button'
+import DemoButton from './demoButton'
 
 export default function HeroSection() {
   return (
@@ -16,7 +16,10 @@ export default function HeroSection() {
         Upload a skin image and receive a smart, easy-to-understand medical report. 
         Powered by AI, guided by care.
       </p>
-      <UploadDialog/>
+      <div className='flex flex-row gap-6'>
+        <UploadDialog/>
+        <DemoButton />
+      </div>
     </section>
   )
 }
