@@ -9,9 +9,30 @@ const outfit = localFont({
   variable: "--font-outfit",
 });
 
-export const metadata: Metadata = {
-  title: "Check Mole",
-  description: "Detect skin cancer early",
+export const metadata = {
+  metadataBase: new URL("https://scanmymole.vercel.app"),
+  title: "ScanMyMole",
+  description: "AI-powered skin lesion analysis for early detection support.",
+  openGraph: {
+    type: "website",
+    url: "https://scanmymole.vercel.app/",
+    title: "ScanMyMole",
+    description: "AI-powered skin lesion analysis for early detection support.",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "ScanMyMole preview"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ScanMyMole",
+    description: "AI-powered skin lesion analysis for early detection support.",
+    images: ["/og.png"]
+  }
 };
 
 export default function RootLayout({

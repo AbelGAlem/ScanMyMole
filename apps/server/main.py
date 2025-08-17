@@ -20,7 +20,6 @@ async def lifespan(app: FastAPI):
     redis_client = redis.from_url(REDIS_URL, encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(redis_client, identifier=get_client_ip)
     yield
-    # Shutdown (if needed)
 
 
 app = FastAPI(title="Skin Cancer ViT+Tabular API", lifespan=lifespan)
@@ -34,9 +33,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API routes
 app.include_router(router, prefix="/api")
-
 
 if __name__ == "__main__":
     import uvicorn

@@ -138,14 +138,14 @@ export default function ReportDetailPage() {
         <p className="ml-7 text-sm text-blue-800">{dInfo.fact}</p>
       </div>
       {/* Download Button */}
-      <div className="flex justify-center">
+      {/* <div className="flex justify-center">
         <Button
           className="flex items-center justify-center gap-2 px-4 py-2 mb-4 mt-2 bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 "
         >
           <Download size={18} />
           Download Full Report
         </Button>
-      </div>
+      </div> */}
       {/* Extra reassurance */}
       <div className="mt-3 text-xs text-gray-400 text-center">
         This AI report does <span className="font-semibold text-red-400">not replace professional medical advice</span>.
