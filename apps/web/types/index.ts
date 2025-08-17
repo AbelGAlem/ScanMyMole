@@ -22,3 +22,21 @@ export type PredictTopItem = {
 export type PredictResponse = {
   top: PredictTopItem[];
 };
+
+
+export type Sex = 'male' | 'female' | 'unknown'
+export type Localization =
+  | 'abdomen'
+  | 'back'
+  | 'chest'
+  | 'ear'
+  | 'face'
+  | 'foot'
+  | 'genital'
+  | 'hand'
+  | 'lower extremity'
+  | 'neck'
+  | 'scalp'
+  | 'trunk'
+  | 'upper extremity'
+  | 'unknown'

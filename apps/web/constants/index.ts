@@ -1,4 +1,4 @@
-import { DiagnosisInfo } from "@/types";
+import { DiagnosisInfo, Localization } from "@/types";
 
 export const faqItems = [
   {
@@ -59,6 +59,23 @@ export const mockReport = {
     "vasc": "Vascular lesion",
     "nv": "Melanocytic nevus"
   }
+
+  export const LOCALIZATION_OPTIONS: { value: Localization; label: string }[] = [
+    { value: 'abdomen', label: 'Abdomen' },
+    { value: 'back', label: 'Back' },
+    { value: 'chest', label: 'Chest' },
+    { value: 'ear', label: 'Ear' },
+    { value: 'face', label: 'Face' },
+    { value: 'foot', label: 'Foot' },
+    { value: 'genital', label: 'Genital' },
+    { value: 'hand', label: 'Hand' },
+    { value: 'lower extremity', label: 'Lower extremity' },
+    { value: 'neck', label: 'Neck' },
+    { value: 'scalp', label: 'Scalp' },
+    { value: 'trunk', label: 'Trunk' },
+    { value: 'upper extremity', label: 'Upper extremity' },
+    { value: 'unknown', label: 'Unknown / missing' },
+  ]
 
 // TODO: Consider mapping on server side
 export const diagnosisInfo: Record<string, DiagnosisInfo> = {
