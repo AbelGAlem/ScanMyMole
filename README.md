@@ -4,6 +4,8 @@ AI-powered **skin lesion analysis** for early detection support. Upload a photo 
 
 **Live demo:** [scanmymole.vercel.app](https://scanmymole.vercel.app)
 
+![ScanMyMole screenshot](apps/web/public/og.png)
+
 > ⚠️ **Disclaimer**  
 > ScanMyMole is not a medical device and does not provide diagnoses. It is intended for educational purposes only. Always consult a licensed clinician for medical advice or treatment.
 
