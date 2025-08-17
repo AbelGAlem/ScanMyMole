@@ -126,7 +126,7 @@ export default function UploadDialog() {
           <DialogTitle>
             {step === 1 ? 'Before we scan' : 'Upload image'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className='text-start'>
             {step === 1
               ? 'Optionally add case information for better accuracy. You can skip this step.'
               : 'Add your image here, up to 5 MB max.'}
