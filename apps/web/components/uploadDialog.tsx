@@ -32,7 +32,8 @@ export default function UploadDialog() {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: false,
-    accept: { "image/*": [] }
+    accept: { "image/*": [] },
+    useFsAccessApi: false,
   })
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -109,22 +110,27 @@ export default function UploadDialog() {
               </>
             )}
             {file && (
-              <div className="relative group">
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt="Preview"
-                  className="max-h-40 rounded-md"
-                />
-                <button
-                  onClick={handleRemove}
-                  className="absolute top-1 right-1 bg-white rounded-full p-1 shadow group-hover:opacity-100 opacity-60 transition"
-                  aria-label="Remove image"
-                  type="button"
-                >
-                  <X size={16} />
-                </button>
+              <div className="flex flex-col items-center">
+                <div className="w-52 relative group">
+                  <div className="w-52 h-52 overflow-hidden rounded-md ">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button
+                    onClick={handleRemove}
+                    className="absolute top-1 right-1 bg-white rounded-full p-1 shadow group-hover:opacity-100 opacity-60 transition"
+                    aria-label="Remove image"
+                    type="button"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
                 <div className="text-xs text-gray-600 mt-2 text-center">{file.name}</div>
               </div>
+              
             )}
           </div>
         </div>
