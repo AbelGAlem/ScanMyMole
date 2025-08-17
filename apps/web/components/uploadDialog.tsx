@@ -10,7 +10,7 @@ import { PredictResponse } from "@/types"
 
 export default function UploadDialog() {
   const [file, setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
   const setImage = useImageStore((s) => s.setImage)
@@ -21,13 +21,19 @@ export default function UploadDialog() {
 
   useEffect(() => {
     if (!file) {
-      setPreview(null)
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(null)
+      }
       return
     }
     const url = URL.createObjectURL(file)
-    setPreview(url)
-    return () => URL.revokeObjectURL(url)
+    setPreviewUrl(url)
+    return () => {
+      URL.revokeObjectURL(url)
+    }
   }, [file])
+
 
   //handle dropping of images in area, with 5MB max size
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -40,16 +46,23 @@ export default function UploadDialog() {
   }, [])
 
   //properties for image dropzone
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, inputRef } = useDropzone({
     onDrop,
     multiple: false,
     accept: { "image/*": [] },
     useFsAccessApi: false,
   })
 
+  const resetAll = () => {
+    setIsUploading(false)
+    setFile(null)
+    if (inputRef?.current) {
+      inputRef.current.value = ''
+    }
+  }
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setFile(null)
+    resetAll()
   }
 
   //upload image to prediction API and navigate to results
@@ -120,16 +133,31 @@ export default function UploadDialog() {
                 <p className="text-xs text-gray-700">Max 5 MB files are allowed</p>
               </>
             )}
-            {preview && file && (
+            {/* Preivew Image */}
+            {file && (
               <div className="flex flex-col items-center">
-                <div className="w-52 relative group">
-                  <div className="w-52 h-52 overflow-hidden rounded-md ">
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
+                <div className="relative group w-52">
+                  <div className="w-52 h-52 overflow-hidden rounded-md">
+                    {previewUrl ? (
+                      <img
+                        src={previewUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback to DataURL if blob fails (very rare)
+                          const imgEl = e.currentTarget
+                          if (file) {
+                            const reader = new FileReader()
+                            reader.onload = () => {
+                              if (typeof reader.result === 'string') imgEl.src = reader.result
+                            }
+                            reader.readAsDataURL(file)
+                          }
+                        }}
+                      />
+                    ) : null}
                   </div>
+
                   <button
                     onClick={handleRemove}
                     className="absolute top-1 right-1 bg-white rounded-full p-1 shadow group-hover:opacity-100 opacity-60 transition"
@@ -141,7 +169,6 @@ export default function UploadDialog() {
                 </div>
                 <div className="text-xs text-gray-600 mt-2 text-center">{file.name}</div>
               </div>
-              
             )}
           </div>
         </div>
