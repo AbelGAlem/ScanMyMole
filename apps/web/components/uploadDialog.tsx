@@ -10,6 +10,7 @@ import { PredictResponse } from "@/types"
 
 export default function UploadDialog() {
   const [file, setFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
   const setImage = useImageStore((s) => s.setImage)
@@ -17,6 +18,16 @@ export default function UploadDialog() {
   const setError = useImageStore((s) => s.setError)
 
   const router = useRouter()
+
+  useEffect(() => {
+    if (!file) {
+      setPreview(null)
+      return
+    }
+    const url = URL.createObjectURL(file)
+    setPreview(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
 
   //handle dropping of images in area, with 5MB max size
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -109,12 +120,12 @@ export default function UploadDialog() {
                 <p className="text-xs text-gray-700">Max 5 MB files are allowed</p>
               </>
             )}
-            {file && (
+            {preview && file && (
               <div className="flex flex-col items-center">
                 <div className="w-52 relative group">
                   <div className="w-52 h-52 overflow-hidden rounded-md ">
                     <img
-                      src={URL.createObjectURL(file)}
+                      src={preview}
                       alt="Preview"
                       className="w-full h-full object-cover"
                     />
