@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { Analytics } from '@vercel/analytics/next';
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "../components/navbar";
@@ -43,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} bg-[#f7f7f7]`}>
+        <Analytics />
         <Navbar />
         <main className="flex flex-col items-center justify-center w-full">
           {children}
