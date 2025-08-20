@@ -9,17 +9,17 @@ export const faqItems = [
   {
     title: "How accurate is the AI diagnosis?",
     content:
-      "The AI is trained on thousands of clinical images and has demonstrated high accuracy in studies, but it is not a replacement for a dermatologist. We recommend using the app as a helpful screening tool and consulting a healthcare professional for a full diagnosis."
+      "The AI is trained on thousands of clinical images and has demonstrated high accuracy in tests, but it is not a replacement for a dermatologist. We recommend using the app as a helpful screening tool and consulting a healthcare professional for a full diagnosis."
   },
   {
     title: "Is my data and privacy protected?",
     content:
-      "Yes, your photos and personal information are encrypted and stored securely. We do not share your data with third parties without your explicit consent. You can delete your data at any time in the app’s settings."
+      "Yes, your photos and personal information are not stored, in fact we dont have a database and all data is stored in memory so be carefull when refreshing your page."
   },
   {
     title: "Can the app diagnose all types of skin cancer?",
     content:
-      "The app is most accurate for common types such as melanoma, basal cell carcinoma, and squamous cell carcinoma. It may not detect rare or unusual skin conditions, so always consult a doctor if you have concerns."
+      "The app is most accurate for common types such as melanoma, basal cell carcinoma and 5 more types of lessions. It may not detect rare or unusual skin conditions, so always consult a doctor if you have concerns."
   },
   {
     title: "What should I do if the app flags a spot as high risk?",
